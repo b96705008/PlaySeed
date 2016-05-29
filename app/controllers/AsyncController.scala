@@ -1,11 +1,18 @@
 package controllers
 
 import akka.actor.ActorSystem
+import akka.actor._
+import akka.pattern.ask
 import javax.inject._
+
+import actors.HelloActor
+import actors.HelloActor.SayHello
 import play.api._
 import play.api.mvc._
+
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
+import akka.util.Timeout
 
 /**
  * This controller creates an `Action` that demonstrates how to write
@@ -19,7 +26,6 @@ import scala.concurrent.duration._
  */
 @Singleton
 class AsyncController @Inject() (actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends Controller {
-
   /**
    * Create an Action that returns a plain text message after a delay
    * of 1 second.
@@ -38,4 +44,15 @@ class AsyncController @Inject() (actorSystem: ActorSystem)(implicit exec: Execut
     promise.future
   }
 
+  /**
+    * Hello Actor test
+    */
+  val helloActor = actorSystem.actorOf(HelloActor.props, "hello-actor")
+  implicit val timeout = Timeout(5 seconds)
+
+  def sayHello(name: String) = Action.async {
+    (helloActor ? SayHello(name)).mapTo[String].map { message =>
+      Ok(message)
+    }
+  }
 }

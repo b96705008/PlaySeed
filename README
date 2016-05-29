@@ -15,11 +15,16 @@ Controllers
 - AsyncController.scala:
 
   Shows how to do asynchronous programming when handling a request.
+  Shows the actor works with play.
 
 - CountController.scala:
 
   Shows how to inject a component into a controller and use the component when
   handling requests.
+
+- StockController.scala
+
+  Shows the basic JSON transform with http.
 
 Components
 ==========
