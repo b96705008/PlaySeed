@@ -7,6 +7,7 @@ import javax.inject._
 
 import actors.HelloActor
 import actors.HelloActor.SayHello
+import actors.ConfiguredActor._
 import play.api._
 import play.api.mvc._
 
@@ -25,7 +26,8 @@ import akka.util.Timeout
  * asynchronous code.
  */
 @Singleton
-class AsyncController @Inject() (actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends Controller {
+class AsyncController @Inject() (actorSystem: ActorSystem, @Named("configured-actor") configuredActor: ActorRef)
+                                (implicit exec: ExecutionContext) extends Controller {
   /**
    * Create an Action that returns a plain text message after a delay
    * of 1 second.
@@ -45,13 +47,19 @@ class AsyncController @Inject() (actorSystem: ActorSystem)(implicit exec: Execut
   }
 
   /**
-    * Hello Actor test
+    * Actor test
     */
   val helloActor = actorSystem.actorOf(HelloActor.props, "hello-actor")
   implicit val timeout = Timeout(5 seconds)
 
   def sayHello(name: String) = Action.async {
     (helloActor ? SayHello(name)).mapTo[String].map { message =>
+      Ok(message)
+    }
+  }
+
+  def getConfig = Action.async {
+    (configuredActor ? GetConfig).mapTo[String].map { message =>
       Ok(message)
     }
   }

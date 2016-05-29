@@ -11,6 +11,7 @@ GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 GET     /hello/:name                controllers.AsyncController.sayHello(name: String)
+GET     /config                     controllers.AsyncController.getConfig
 
 # Stock example
 GET     /stock                      controllers.StockController.getStock
