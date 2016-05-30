@@ -8,10 +8,9 @@ import javax.inject._
 import actors.HelloActor
 import actors.HelloActor.SayHello
 import actors.ConfiguredActor._
-import play.api._
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
 import akka.util.Timeout
 
@@ -26,7 +25,9 @@ import akka.util.Timeout
  * asynchronous code.
  */
 @Singleton
-class AsyncController @Inject() (actorSystem: ActorSystem, @Named("configured-actor") configuredActor: ActorRef)
+class AsyncController @Inject() (actorSystem: ActorSystem,
+                                 @Named("configured-actor") configuredActor: ActorRef,
+                                 @Named("parent-actor") parentActor: ActorRef)
                                 (implicit exec: ExecutionContext) extends Controller {
   /**
    * Create an Action that returns a plain text message after a delay
@@ -60,6 +61,17 @@ class AsyncController @Inject() (actorSystem: ActorSystem, @Named("configured-ac
 
   def getConfig = Action.async {
     (configuredActor ? GetConfig).mapTo[String].map { message =>
+      Ok(message)
+    }
+  }
+
+  import actors.ParentActor._
+  import actors.ConfiguredChildActor._
+  val rogerActor = Await.result[ActorRef](
+    (parentActor ? GetChild("Roger")).mapTo[ActorRef], timeout.duration)
+
+  def getChildConfig = Action.async {
+    (rogerActor ? GetChildConfig).mapTo[String].map { message =>
       Ok(message)
     }
   }

@@ -3,8 +3,7 @@ import play.api.libs.concurrent.AkkaGuiceSupport
 import java.time.Clock
 
 import services.{ApplicationTimer, AtomicCounter, Counter}
-
-import actors.ConfiguredActor
+import actors.{ConfiguredActor, ConfiguredChildActor, ParentActor}
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -28,6 +27,9 @@ class Module extends AbstractModule with AkkaGuiceSupport {
     bind(classOf[Counter]).to(classOf[AtomicCounter])
     // Bind Configured Actor
     bindActor[ConfiguredActor]("configured-actor")
+    // Bind Parent & Child Actor
+    bindActor[ParentActor]("parent-actor")
+    bindActorFactory[ConfiguredChildActor, ConfiguredChildActor.Factory]
   }
 
 }

@@ -12,6 +12,7 @@ GET     /count                      controllers.CountController.count
 GET     /message                    controllers.AsyncController.message
 GET     /hello/:name                controllers.AsyncController.sayHello(name: String)
 GET     /config                     controllers.AsyncController.getConfig
+GET     /config/child               controllers.AsyncController.getChildConfig
 
 # Stock example
 GET     /stock                      controllers.StockController.getStock
