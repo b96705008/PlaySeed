@@ -8,6 +8,7 @@ import javax.inject._
 import actors.HelloActor
 import actors.HelloActor.SayHello
 import actors.ConfiguredActor._
+import akka.routing.RoundRobinPool
 import play.api.mvc._
 
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
@@ -72,6 +73,13 @@ class AsyncController @Inject() (actorSystem: ActorSystem,
 
   def getChildConfig = Action.async {
     (rogerActor ? GetChildConfig).mapTo[String].map { message =>
+      Ok(message)
+    }
+  }
+
+  val router = actorSystem.actorOf(RoundRobinPool(5).props(Props[HelloActor]), "router")
+  def helloRouter(name: String) = Action.async {
+    (router ? SayHello(name)).mapTo[String].map { message =>
       Ok(message)
     }
   }

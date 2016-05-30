@@ -11,6 +11,7 @@ GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 GET     /hello/:name                controllers.AsyncController.sayHello(name: String)
+GET     /hello/router/:name         controllers.AsyncController.helloRouter(name: String)
 GET     /config                     controllers.AsyncController.getConfig
 GET     /config/child               controllers.AsyncController.getChildConfig
 
